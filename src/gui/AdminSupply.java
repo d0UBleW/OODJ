@@ -1,0 +1,935 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package gui;
+
+import entity.*;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.table.DefaultTableModel;
+import util.Convert;
+import util.Editable;
+import util.InitDictionary;
+import util.Transfer;
+
+/**
+ *
+ * @author LEGION
+ */
+public class AdminSupply extends javax.swing.JFrame implements Editable {
+
+    private DefaultComboBoxModel cbxVacModel;
+    private DefaultComboBoxModel cbxCentreModel;
+    private DefaultTableModel tblSupModel;
+    private SpinnerNumberModel spModel;
+    private int pointer;
+    private List<Integer> searchIdx;
+    private DefaultListModel listModel;
+    private Map<String, Vaccine> vacDataID;
+    private Map<String, Vaccine> vacDataName;
+    private Map<String, Centre> centreDict;
+    
+    /**
+     * Creates new form AdminSupply
+     */
+    public AdminSupply() {
+        initComponents();
+        this.setLocationRelativeTo(null);
+        cbxVacModel = (DefaultComboBoxModel) cbxVac.getModel();
+        cbxCentreModel = (DefaultComboBoxModel) cbxCentre.getModel();
+        tblSupModel = (DefaultTableModel) tblSupply.getModel();
+        lstSearch.setModel(new DefaultListModel());
+        listModel = (DefaultListModel) lstSearch.getModel();
+        vacDataID = InitDictionary.vacData(false);
+        vacDataName = InitDictionary.vacData(true);
+        if (vacDataID.size() > 0) {
+            for (Vaccine vac: vacDataID.values()) {
+                cbxVacModel.addElement(vac.getName());
+            }
+        }
+        centreDict = InitDictionary.centreData();
+        if (centreDict.size() > 0) {
+            for (String id: centreDict.keySet()) {
+                cbxCentreModel.addElement(id);
+            }
+        }
+        updateSpinner(false);
+        enableDisablePanel(false);
+        btnView.doClick();
+        tblSupply.setDefaultEditor(Object.class, null);
+        searchIdx = new ArrayList<>();
+    }
+
+    public void updateSpinner(boolean modify) {
+        if (lblQty.getText().isBlank()) {
+            return;
+        }
+        Long currentQty = Long.parseLong(lblQty.getText());
+        spModel = (SpinnerNumberModel) spinAmt.getModel();
+        if (modify) {
+            spModel = new SpinnerNumberModel(0, 0, Long.MAX_VALUE, 1);
+        }
+        else {
+            spModel = new SpinnerNumberModel(0, -1*currentQty, Long.MAX_VALUE - currentQty, 1);
+        }
+        spinAmt.setModel(spModel);
+    }
+
+    @Override
+    public void enableDisablePanel(boolean state) {
+        cbxCentre.setEnabled(state);
+        cbxVac.setEnabled(state);
+        spinAmt.setEnabled(state);
+        btnOk.setVisible(state);
+        btnCancel.setVisible(state);
+    }
+
+    @Override
+    public void enableDisableButton(boolean state) {
+        tglAdd.setEnabled(state);
+        tglModify.setEnabled(state);
+        tglRemove.setEnabled(state);
+        btnView.setEnabled(state);
+        btnSearch.setEnabled(state);
+        lstSearch.setEnabled(state);
+        tblSupply.setEnabled(state);
+    }
+
+    @Override
+    public void write() {
+        int col = tblSupply.getColumnCount();
+        int row = tblSupply.getRowCount();
+        Map<String, Map<String, Long>> tableData = new HashMap<>();
+        for (int i = 0; i < row; i++) {
+            Map<String, Long> stockDict = new HashMap<>();
+            for (int j = 2; j < col; j++) {
+                String colName = tblSupply.getColumnName(j);
+                stockDict.put(vacDataName.get(colName).getID(),
+                        Long.parseLong(tblSupply.getValueAt(i, j).toString()));
+            }
+            tableData.put((String) tblSupply.getValueAt(i, 0), stockDict);
+        }
+        Centre[] centreArr = centreDict.values().toArray(new Centre[0]);
+        for (Centre ctr: centreArr) {
+            List<VaccineStock> vStock = ctr.getStockVaccines();
+            for (VaccineStock stock: vStock) {
+                Map<String, Long> temp = tableData.get(ctr.getCentreID());
+                long newQty = temp.get(stock.getID());
+                stock.setQuantity(newQty);
+            }
+        }
+        Transfer.exportObject(centreArr, Centre.FILENAME);
+    }
+
+    @Override
+    public void fillDetails() {
+        if (pointer != -1) {
+            cbxCentre.setSelectedItem(tblSupply.getValueAt(pointer, 0));
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        dialogSearch = new javax.swing.JDialog();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        dialogTxtSearch = new javax.swing.JTextField();
+        dialogCbxCategory = new javax.swing.JComboBox<>();
+        dialogBtnOk = new javax.swing.JButton();
+        dialogBtnCancel = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        btnPeople = new javax.swing.JButton();
+        btnAppoint = new javax.swing.JButton();
+        btnSupply = new javax.swing.JButton();
+        btnCentre = new javax.swing.JButton();
+        btnVaccine = new javax.swing.JButton();
+        btnLogout = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        cbxCentre = new javax.swing.JComboBox<>();
+        cbxVac = new javax.swing.JComboBox<>();
+        jLabel3 = new javax.swing.JLabel();
+        lblQty = new javax.swing.JLabel();
+        lblAmount = new javax.swing.JLabel();
+        spinAmt = new javax.swing.JSpinner();
+        btnOk = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
+        btnView = new javax.swing.JButton();
+        btnSearch = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        lstSearch = new javax.swing.JList<>();
+        tglAdd = new javax.swing.JToggleButton();
+        tglModify = new javax.swing.JToggleButton();
+        tglRemove = new javax.swing.JToggleButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblSupply = new javax.swing.JTable();
+
+        dialogSearch.setTitle("Search");
+        dialogSearch.setModal(true);
+        dialogSearch.setResizable(false);
+
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel4.setText("Search");
+
+        dialogTxtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                dialogTxtSearchKeyPressed(evt);
+            }
+        });
+
+        dialogCbxCategory.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Centre ID", "Centre Name" }));
+        dialogCbxCategory.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                dialogCbxCategoryKeyPressed(evt);
+            }
+        });
+
+        dialogBtnOk.setText("OK");
+        dialogBtnOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dialogBtnOkActionPerformed(evt);
+            }
+        });
+        dialogBtnOk.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                dialogBtnOkKeyPressed(evt);
+            }
+        });
+
+        dialogBtnCancel.setText("Cancel");
+        dialogBtnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dialogBtnCancelActionPerformed(evt);
+            }
+        });
+        dialogBtnCancel.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                dialogBtnCancelKeyPressed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel4)
+                        .addGap(18, 18, 18)
+                        .addComponent(dialogTxtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(dialogCbxCategory, 0, 133, Short.MAX_VALUE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(dialogBtnOk, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(dialogBtnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(dialogTxtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dialogCbxCategory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(dialogBtnCancel)
+                    .addComponent(dialogBtnOk))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout dialogSearchLayout = new javax.swing.GroupLayout(dialogSearch.getContentPane());
+        dialogSearch.getContentPane().setLayout(dialogSearchLayout);
+        dialogSearchLayout.setHorizontalGroup(
+            dialogSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        dialogSearchLayout.setVerticalGroup(
+            dialogSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Supply (Admin)");
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 204));
+
+        btnPeople.setText("People");
+        btnPeople.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPeopleActionPerformed(evt);
+            }
+        });
+
+        btnAppoint.setText("Appointment");
+        btnAppoint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAppointActionPerformed(evt);
+            }
+        });
+
+        btnSupply.setText("Supply");
+        btnSupply.setEnabled(false);
+
+        btnCentre.setText("Centre");
+        btnCentre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCentreActionPerformed(evt);
+            }
+        });
+
+        btnVaccine.setText("Vaccine");
+        btnVaccine.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVaccineActionPerformed(evt);
+            }
+        });
+
+        btnLogout.setText("Logout");
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnPeople, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnAppoint)
+                .addGap(18, 18, 18)
+                .addComponent(btnSupply, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnCentre, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnVaccine, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnPeople)
+                    .addComponent(btnAppoint)
+                    .addComponent(btnSupply)
+                    .addComponent(btnCentre)
+                    .addComponent(btnVaccine)
+                    .addComponent(btnLogout))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel1.setText("Centre ID");
+
+        jLabel2.setText("Vaccine");
+
+        cbxCentre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxCentreActionPerformed(evt);
+            }
+        });
+
+        cbxVac.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxVacActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("Current quantity");
+
+        lblAmount.setText("Amount");
+
+        btnOk.setText("OK");
+        btnOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOkActionPerformed(evt);
+            }
+        });
+
+        btnCancel.setText("Cancel");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(lblAmount, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblQty, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cbxVac, 0, 129, Short.MAX_VALUE)
+                            .addComponent(cbxCentre, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(spinAmt)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(btnOk, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(272, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(cbxCentre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(cbxVac, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(lblQty))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblAmount)
+                    .addComponent(spinAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnOk)
+                    .addComponent(btnCancel))
+                .addContainerGap())
+        );
+
+        jScrollPane2.setViewportView(jPanel3);
+
+        btnView.setText("View");
+        btnView.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewActionPerformed(evt);
+            }
+        });
+
+        btnSearch.setText("Search");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
+
+        lstSearch.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        lstSearch.setToolTipText("");
+        lstSearch.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                lstSearchValueChanged(evt);
+            }
+        });
+        jScrollPane3.setViewportView(lstSearch);
+
+        tglAdd.setText("Add/Sub");
+        tglAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tglAddActionPerformed(evt);
+            }
+        });
+
+        tglModify.setText("Modify");
+        tglModify.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tglModifyActionPerformed(evt);
+            }
+        });
+
+        tglRemove.setText("Remove");
+        tglRemove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tglRemoveActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(tglAdd)
+                                .addGap(18, 18, 18)
+                                .addComponent(tglRemove, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(13, 13, 13)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(5, 5, 5)
+                                .addComponent(tglModify)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnView, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE))))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnView)
+                    .addComponent(tglAdd)
+                    .addComponent(tglModify)
+                    .addComponent(tglRemove))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnSearch)
+                        .addGap(8, 8, 8)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        tblSupply.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblSupply.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tblSupply.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblSupplyMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblSupply);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewActionPerformed
+        // TODO add your handling code here:
+        tblSupModel.setRowCount(0);
+        int colCount = 2 + vacDataID.size();
+        String[] colIdentifier = new String[colCount];
+        colIdentifier[0] = "Centre ID";
+        colIdentifier[1] = "Centre Name";
+        int counter = 2;
+        for (String vacName: vacDataName.keySet()) {
+            colIdentifier[counter] = vacName;
+            counter++;
+        }
+        tblSupModel.setColumnCount(colCount);
+        tblSupModel.setColumnIdentifiers(colIdentifier);
+        Centre[] ctrArr = centreDict.values().toArray(new Centre[0]);
+        int j = 0;
+        for (Centre ctr: ctrArr) {
+            Object[] temp = new Object[colCount];
+            List<VaccineStock> vStock = ctr.getStockVaccines();
+            temp[0] = ctr.getCentreID();
+            temp[1] = ctr.getName();
+            for (int i = 2; i < colCount; i++) {
+                for (VaccineStock s: vStock) {
+                    if (s.getName().equals(tblSupply.getColumnName(i))) {
+                        temp[i] = s.getQuantity();
+                        break;
+                    }
+                }
+            }
+            tblSupModel.addRow(temp);
+            if (temp[0].equals(cbxCentre.getSelectedItem())) {
+                pointer = j;
+            }
+            j++;
+        }
+    }//GEN-LAST:event_btnViewActionPerformed
+
+    private void cbxCentreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxCentreActionPerformed
+        // TODO add your handling code here:
+        String centreID = (String) cbxCentre.getSelectedItem();
+        int row = tblSupply.getRowCount();
+        for (int i = 0; i < row; i++) {
+            if (tblSupply.getValueAt(i, 0).equals(centreID)) {
+                pointer = i;
+                break;
+            }
+        }
+        String vacName = (String) cbxVac.getSelectedItem();
+        Map<String, Centre> centreData = InitDictionary.centreData();
+        List<VaccineStock> vStock = centreData.get(centreID).getStockVaccines();
+        for (VaccineStock stock: vStock) {
+            if (stock.getName().equals(vacName)) {
+                lblQty.setText(String.valueOf(stock.getQuantity()));
+                break;
+            }
+        }
+        updateSpinner(tglModify.isSelected());
+    }//GEN-LAST:event_cbxCentreActionPerformed
+
+    private void cbxVacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxVacActionPerformed
+        // TODO add your handling code here:
+        try {
+            String centreID = (String) cbxCentre.getSelectedItem();
+            String vacName = (String) cbxVac.getSelectedItem();
+            Map<String, Centre> centreData = InitDictionary.centreData();
+            if (!centreID.isBlank()) {
+                List<VaccineStock> vStock = centreData.get(centreID).getStockVaccines();
+                for (VaccineStock stock: vStock) {
+                    if (stock.getName().equals(vacName)) {
+                        lblQty.setText(String.valueOf(stock.getQuantity()));
+                        break;
+                    }
+                }
+            }
+            updateSpinner(tglModify.isSelected());
+        }
+        catch (NullPointerException e) {
+        }
+    }//GEN-LAST:event_cbxVacActionPerformed
+
+    private void tglModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglModifyActionPerformed
+        // TODO add your handling code here:
+        if (tglModify.isSelected()) {
+            updateSpinner(tglModify.isSelected());
+            enableDisablePanel(true);
+            enableDisableButton(false);
+            tglModify.setEnabled(true);
+            lblAmount.setText("New Quantity");
+        }
+        else {
+            btnCancel.doClick();
+        }
+    }//GEN-LAST:event_tglModifyActionPerformed
+
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        // TODO add your handling code here:
+        enableDisableButton(true);
+        enableDisablePanel(false);
+        tglModify.setSelected(false);
+        tglAdd.setSelected(false);
+        tglRemove.setSelected(false);
+        lblAmount.setText("Amount");
+        spinAmt.setVisible(true);
+        spinAmt.setValue(0);
+    }//GEN-LAST:event_btnCancelActionPerformed
+
+    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
+        // TODO add your handling code here:
+        if (cbxCentre.getSelectedIndex() == -1) {
+            PopupDialog.error("Please select a centre");
+            return;
+        }
+        long currentQty = Long.parseLong(lblQty.getText());
+        Double temp = Double.parseDouble(String.valueOf(spinAmt.getValue()));
+        long newAmt = temp.longValue();
+        if (tglAdd.isSelected()) {
+            currentQty += newAmt;
+        }
+        else if (tglModify.isSelected()) {
+            currentQty = newAmt;
+        }
+        else {
+            currentQty = 0;
+        }
+        int colCount = tblSupply.getColumnCount();
+        for (int i = 2; i < colCount; i++) {
+            if (tblSupModel.getColumnName(i).equals(cbxVac.getSelectedItem())) {
+                tblSupply.setValueAt(currentQty, pointer, i);
+                break;
+            }
+        }
+        write();
+        lblQty.setText(String.valueOf(currentQty));
+        btnCancel.doClick();
+        dialogBtnOk.doClick();
+    }//GEN-LAST:event_btnOkActionPerformed
+
+    private void tglAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglAddActionPerformed
+        // TODO add your handling code here:
+        if (tglAdd.isSelected()) {
+            updateSpinner(tglModify.isSelected());
+            enableDisablePanel(true);
+            enableDisableButton(false);
+            tglAdd.setEnabled(true);
+            lblAmount.setText("Amount to be adjusted");
+        }
+        else {
+            btnCancel.doClick();
+        }
+    }//GEN-LAST:event_tglAddActionPerformed
+
+    private void tblSupplyMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSupplyMouseClicked
+        // TODO add your handling code here:
+        pointer = tblSupply.getSelectedRow();
+        fillDetails();
+    }//GEN-LAST:event_tblSupplyMouseClicked
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        // TODO add your handling code here:
+        dialogSearch.setLocationRelativeTo(null);
+        dialogSearch.pack();
+        dialogSearch.setVisible(true);
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void dialogBtnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dialogBtnCancelActionPerformed
+        // TODO add your handling code here:
+        dialogSearch.dispose();
+    }//GEN-LAST:event_dialogBtnCancelActionPerformed
+
+    private void dialogBtnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dialogBtnOkActionPerformed
+        // TODO add your handling code here:
+        btnView.doClick();
+        listModel.removeAllElements();
+        int row = tblSupply.getRowCount();
+        int selectedCol = dialogCbxCategory.getSelectedIndex();
+        searchIdx.clear();
+        String keyword = dialogTxtSearch.getText();
+        if (keyword.isBlank()) {
+            return;
+        }
+        
+        keyword = Convert.escapeSpecialChar(keyword);
+        keyword = ".*" + keyword + ".*";
+        
+        Pattern pattern = Pattern.compile(keyword, Pattern.CASE_INSENSITIVE);
+        Matcher matcher;
+
+        for (int i = 0; i < row; i++) {
+            String cell = (String) tblSupply.getValueAt(i, selectedCol);
+            matcher = pattern.matcher(cell);
+            if (matcher.find()) {
+                searchIdx.add(i);
+                String[] temp = new String[2];
+                for (int j = 0; j < 2; j++) {
+                    temp[j] = tblSupply.getValueAt(i, j).toString();
+                }
+                listModel.addElement(String.join(";", temp));
+            }
+        }
+    }//GEN-LAST:event_dialogBtnOkActionPerformed
+
+    private void dialogTxtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dialogTxtSearchKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
+            dialogBtnOk.doClick();
+        }
+        else if (evt.getKeyChar() == KeyEvent.VK_ESCAPE) {
+            dialogBtnCancel.doClick();
+        }
+    }//GEN-LAST:event_dialogTxtSearchKeyPressed
+
+    private void dialogCbxCategoryKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dialogCbxCategoryKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
+            dialogBtnOk.doClick();
+        }
+        else if (evt.getKeyChar() == KeyEvent.VK_ESCAPE) {
+            dialogBtnCancel.doClick();
+        }
+    }//GEN-LAST:event_dialogCbxCategoryKeyPressed
+
+    private void dialogBtnOkKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dialogBtnOkKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
+            dialogBtnOk.doClick();
+        }
+        else if (evt.getKeyChar() == KeyEvent.VK_ESCAPE) {
+            dialogBtnCancel.doClick();
+        }
+    }//GEN-LAST:event_dialogBtnOkKeyPressed
+
+    private void dialogBtnCancelKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dialogBtnCancelKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyChar() == KeyEvent.VK_ENTER || evt.getKeyChar() == KeyEvent.VK_ESCAPE) {
+            dialogBtnCancel.doClick();
+        }
+    }//GEN-LAST:event_dialogBtnCancelKeyPressed
+
+    private void lstSearchValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstSearchValueChanged
+        // TODO add your handling code here:
+        try {
+            int idx = lstSearch.getSelectedIndex();
+            pointer = searchIdx.get(idx);
+            fillDetails();
+        }
+        catch (IndexOutOfBoundsException e) {
+        }
+    }//GEN-LAST:event_lstSearchValueChanged
+
+    private void tglRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglRemoveActionPerformed
+        // TODO add your handling code here:
+        if (tglRemove.isSelected()) {
+            enableDisablePanel(true);
+            enableDisableButton(false);
+            tglRemove.setEnabled(true);
+            lblAmount.setVisible(false);
+            spinAmt.setVisible(false);
+        }
+        else {
+            btnCancel.doClick();
+        }
+    }//GEN-LAST:event_tglRemoveActionPerformed
+
+    private void btnPeopleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPeopleActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        new AdminPeople().setVisible(true);
+    }//GEN-LAST:event_btnPeopleActionPerformed
+
+    private void btnAppointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAppointActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        new AdminAppoint().setVisible(true);
+    }//GEN-LAST:event_btnAppointActionPerformed
+
+    private void btnCentreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCentreActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        new AdminCentre().setVisible(true);
+    }//GEN-LAST:event_btnCentreActionPerformed
+
+    private void btnVaccineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVaccineActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        new AdminVaccine().setVisible(true);
+    }//GEN-LAST:event_btnVaccineActionPerformed
+
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        new LoginForm().setVisible(true);
+    }//GEN-LAST:event_btnLogoutActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(AdminSupply.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(AdminSupply.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(AdminSupply.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(AdminSupply.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new AdminSupply().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAppoint;
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnCentre;
+    private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnOk;
+    private javax.swing.JButton btnPeople;
+    private javax.swing.JButton btnSearch;
+    private javax.swing.JButton btnSupply;
+    private javax.swing.JButton btnVaccine;
+    private javax.swing.JButton btnView;
+    private javax.swing.JComboBox<String> cbxCentre;
+    private javax.swing.JComboBox<String> cbxVac;
+    private javax.swing.JButton dialogBtnCancel;
+    private javax.swing.JButton dialogBtnOk;
+    private javax.swing.JComboBox<String> dialogCbxCategory;
+    private javax.swing.JDialog dialogSearch;
+    private javax.swing.JTextField dialogTxtSearch;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel lblAmount;
+    private javax.swing.JLabel lblQty;
+    private javax.swing.JList<String> lstSearch;
+    private javax.swing.JSpinner spinAmt;
+    private javax.swing.JTable tblSupply;
+    private javax.swing.JToggleButton tglAdd;
+    private javax.swing.JToggleButton tglModify;
+    private javax.swing.JToggleButton tglRemove;
+    // End of variables declaration//GEN-END:variables
+}

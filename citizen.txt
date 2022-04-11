@@ -1,0 +1,6 @@
+IC000001;abcde123;Will;02/10/2021;-;-
+IC000004;abcde123;adjf;01/10/2021;-;-
+IC123000;123abcde;William;01/12/2021;tp059360@mail.apu.edu.my;-
+IC000002;abcde123;lliW;01/10/2021;-;-
+IC000123;newpass123;Eve;06/11/1990;-;-
+IC000003;abcde123;adfkj;03/10/2021;-;-
